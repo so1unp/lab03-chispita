@@ -51,7 +51,6 @@ struct cmd *parsecmd(char *);   // Parse the user's command.
 void runcmd(struct cmd *cmd)
 {
     struct execcmd *ecmd;
-    struct pipecmd *pcmd;
     struct redircmd *rcmd;
 
     if (cmd == 0)
@@ -62,26 +61,33 @@ void runcmd(struct cmd *cmd)
             fprintf(stderr, "unknown runcmd\n");
             exit(-1);
 
+        //EXEC es el comando más simple, el que se ejecuta directamente con execvp. Si el comando no tiene argumentos, salimos sin hacer nada. Si execvp retorna, es que ha habido un error, así que lo reportamos con perror y salimos con error.
         case EXEC:
             ecmd = (struct execcmd *) cmd;
+            //si no hay comando, salimos sin hacer nada
             if (ecmd->argv[0] == 0)
                 exit(0);
-            fprintf(stderr, "exec not implemented\n");
-            // Your code here ...
+            //usamos execvp para buscar el comando en el PATH
+            execvp(ecmd->argv[0], ecmd->argv);
+            //y si retornamos, es porque execvp ha fallado
+            perror("exec");
             break;
 
+        // En REDIR tenemos que redirigir la entrada o salida del comando que se va a ejecutar
         case REDIR:
-            fprintf(stderr, "redir not implemented\n");
-            // Your code here ...
             rcmd = (struct redircmd *) cmd;
+            // cerramos el descriptor de archivo que se va a redirigir 0 < 1 >
+            close(rcmd->fd);
+            if (open(rcmd->file, rcmd->mode, 0644) < 0)
+            {
+                perror("open");
+                exit(-1);
+            }
             runcmd(rcmd->cmd);
             break;
 
         case PIPE:
-            fprintf(stderr, "pipe not implemented\n");
-            // Your code here ...
-            pcmd = (struct pipecmd *) cmd;
-            runcmd(pcmd->left);
+          //implementar
             break;
     }
     exit(0);

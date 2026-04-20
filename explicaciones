@@ -1,0 +1,19 @@
+del ejercicio 1.1 (joaco)
+-En runcmd() elimine la variable del pipe por un rato
+-implemente el caso de EXEC que es el comando que se ejecuta con execvp. Si el comando no tiene argumentos, salimos sin hacer nada. Si execvp retorna, es que ha habido un error, así que lo reportamos con perror y salimos con error.
+
+-aca hice un intento de prueba de cuando el programa da error:
+joakito1910@joakito1910-HP-Laptop-15-dy2xxx:~/lab03-chispita$ gcc sh.c -o sh
+joakito1910@joakito1910-HP-Laptop-15-dy2xxx:~/lab03-chispita$ ./sh
+$ invento_cualquier_cosa
+exec: No such file or directory
+$ 
+
+
+-y aca cuando da todo okey
+joakito1910@joakito1910-HP-Laptop-15-dy2xxx:~/lab03-chispita$ gcc sh.c -o sh
+joakito1910@joakito1910-HP-Laptop-15-dy2xxx:~/lab03-chispita$ ./sh
+$ echo "sistemas operativos" > so.txt
+$ cat < so.txt
+"sistemas operativos"
+$ 
