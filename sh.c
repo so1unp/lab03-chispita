@@ -97,9 +97,57 @@ void runcmd(struct cmd *cmd)
             break;
 
         case REDIR:
-            fprintf(stderr, "redir not implemented\n");
-            // Your code here ...
+            
             rcmd = (struct redircmd *) cmd;
+            char buffer[1000];
+            
+            if(rcmd->mode == O_RDONLY){ // read only -> solo va a leer lo que haya en el archivo elegido
+                
+                /* REDIRECCIÓN < */
+                
+                int fd = open(rcmd->file, O_RDONLY, 0644); // abre el archivo actual en modo lectura
+                if(fd==-1) {
+                    perror("¡Error al abrir el archivo!");
+                    exit(EXIT_FAILURE);
+                }
+
+                dup2(fd, 0);
+                
+                /*
+                    dup redirige file descriptors: 
+
+                        dup2(fd, 0) -> remplaza el fd 0 (stdin) por el nuevo fd
+
+                    Recordemos que los file descriptor tienen números reservados:
+
+                        0 -> teclado/entrada estándar (stdin)
+                        1 -> pantalla/salida estándar (stdout)
+                        2 -> error estándar (stderr)
+
+                    Al hacer "dup2(fd, 0)", el fd 0 pasa a ser esto:
+
+                        0 -> archivo (por ej: so.txt)
+
+                    Ahora al ejecutar 'cat' lee directamente del file descriptor 0, es decir, del archivo
+                */
+
+                close(fd);
+
+            }else{ // write only -> escribe en un archivo la salida estándar
+                
+                /* REDIRECCIÓN > */
+
+                int fd = open(rcmd->file, O_WRONLY | O_CREAT | O_EXCL, 0644); // abre el archivo actual en modo escritura y crea una copia
+                if(fd==-1) {
+                    perror("¡Error al abrir el archivo!");
+                    exit(EXIT_FAILURE);
+                }
+
+                dup2(fd, 1); // reemplaza el fd 1 (stdout) por el nuevo fd
+                close(fd);
+
+            }
+
             runcmd(rcmd->cmd);
             break;
 
