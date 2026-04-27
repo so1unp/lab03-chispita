@@ -1,0 +1,22 @@
+1. Al ejecutar la serie de comandos, se puede ver que el proceso padre está en estado 
+S (sleep), mientras que el proceso hijo (identificado porque su PID es el ID del padre)
+está en estado R (running). Esto ocurre porque, al crear un nuevo proceso, el padre 
+ejecuta la syscall sleep().
+
+2. Al ejecutar ese comando, el padre espera 30 segundos mientras se crean 10 procesos 
+hijos, los cuales se muestran ordenados según la cantidad de tiempo que la CPU les haya
+cedido.
+Al sumar estos tiempos, el resultado es mayor al tiempo de espera del padre, y esto es
+porque los procesos se ejecutan en paralelo. Estando en un entorno multiprocesador, 
+el scheduler del sistema operativo distribuye los hijos entre los diferentes núcleos 
+disponibles, permitiéndoles acumular tiempo de procesamiento simultáneamente.
+
+3. Cuando se le indica al programa que no se cambien las prioridades, los procesos hijos
+nuevamente mustran tener un reparto equitativo del tiempo de CPU, teniendo todos nice = 0. 
+Esto sucede debido a que la disponibilidad de hilos supera la cantidad de procesos 
+creados, por lo que no necesitan competir por los recursos.
+Sin embargo, si se dispusiera de una cantidad de núcleos menor, o si se crearan más 
+procesos, lo que se esperaría ver es que el scheduler intente brindarle tiempos a 
+cada proceso de manera dinámica, debido a que todos tienen el mismo orden de prioridad. 
+Esto haría que los tiempos finales varíen entre un proceso y otro, ya que el sistema
+operativo reparte el uso del procesador según la disponibilidad de recursos en cada momento.
